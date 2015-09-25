@@ -43,6 +43,7 @@ func (pt *ParallelTask) Run(MaxParallelingTask int) {
 	go func() {
 		for {
 			tokens <- 1
+			defer func(){<-tokens}()
 			work := <-pt.inputChan
 			re, err := work.WorkerFunc(work.Input)
 			if err != nil {
@@ -50,7 +51,6 @@ func (pt *ParallelTask) Run(MaxParallelingTask int) {
 				return
 			}
 			pt.ResultChan <- re
-			<-tokens
 		}
 	}()
 }
